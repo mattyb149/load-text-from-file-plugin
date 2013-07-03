@@ -94,20 +94,22 @@ public class LoadTextFromFileMeta extends BaseStepMeta implements StepMetaInterf
 	/** The maximum number or lines to read */
 	private  long  rowLimit;
 
+	private String outputFormat;
+	
 	/** The fields to import... */
 	private LoadTextFromFileField inputFields[];
 	
-    /** The encoding to use for reading: null or empty string means system default encoding */
-    private String encoding;
+  /** The encoding to use for reading: null or empty string means system default encoding */
+  private String encoding;
     
-    /**  Dynamic FilenameField    */
-    private  String DynamicFilenameField;
+  /**  Dynamic FilenameField    */
+  private  String DynamicFilenameField;
     
-    /**  Is In fields     */
-    private  boolean fileinfield;
-    
-    /** Flag: add result filename **/
-    private boolean addresultfile;
+  /**  Is In fields     */
+  private  boolean fileinfield;
+   
+  /** Flag: add result filename **/
+  private boolean addresultfile;
     
 	/** Array of boolean values as string, indicating if a file is required. */
 	private  String  fileRequired[];
@@ -444,7 +446,13 @@ public class LoadTextFromFileMeta extends BaseStepMeta implements StepMetaInterf
         return rowLimit;
     }
     
- 
+    public String getOutputFormat() {
+      return outputFormat;
+    }
+    
+    public void setOutputFormat(String outputFormat) {
+      this.outputFormat = outputFormat;
+    }
     
     /**
      * @param rowLimit The rowLimit to set.
@@ -532,6 +540,7 @@ public class LoadTextFromFileMeta extends BaseStepMeta implements StepMetaInterf
         
         retval.append("    "+XMLHandler.addTagValue("rownum_field",    rowNumberField));
         retval.append("    "+XMLHandler.addTagValue("encoding",        encoding));
+        retval.append("    "+XMLHandler.addTagValue("output_format",   outputFormat));
         
         retval.append("    <file>"+Const.CR);
         for (int i=0;i<fileName.length;i++)
@@ -578,6 +587,7 @@ public class LoadTextFromFileMeta extends BaseStepMeta implements StepMetaInterf
 			includeRowNumber  = "Y".equalsIgnoreCase(XMLHandler.getTagValue(stepnode, "rownum"));
 			rowNumberField    = XMLHandler.getTagValue(stepnode, "rownum_field");
 			encoding          = XMLHandler.getTagValue(stepnode, "encoding");
+			outputFormat      = XMLHandler.getTagValue(stepnode, "output_format");
 	
 			Node filenode  = XMLHandler.getSubNode(stepnode,   "file");
 			Node fields    = XMLHandler.getSubNode(stepnode,   "fields");
@@ -641,13 +651,13 @@ public class LoadTextFromFileMeta extends BaseStepMeta implements StepMetaInterf
 	
 	public void setDefault()
 	{
-	    shortFileFieldName=null;
-	    pathFieldName=null;
-	    hiddenFieldName=null;
-	    lastModificationTimeFieldName=null;
-	    uriNameFieldName=null;
-	    rootUriNameFieldName=null;
-	    extensionFieldName=null;
+	  shortFileFieldName=null;
+	  pathFieldName=null;
+	  hiddenFieldName=null;
+	  lastModificationTimeFieldName=null;
+	  uriNameFieldName=null;
+	  rootUriNameFieldName=null;
+	  extensionFieldName=null;
 
 		encoding= "";
 		IsIgnoreEmptyFile=false;
@@ -678,6 +688,7 @@ public class LoadTextFromFileMeta extends BaseStepMeta implements StepMetaInterf
 		}
 
 		rowLimit=0;
+		outputFormat = "Plain text";
 		
 		fileinfield    = false;
 		DynamicFilenameField = null;
@@ -793,19 +804,20 @@ public class LoadTextFromFileMeta extends BaseStepMeta implements StepMetaInterf
 	{
 		try
 		{
-			includeFilename   =      rep.getStepAttributeBoolean(id_step, "include");  
-			filenameField     =      rep.getStepAttributeString (id_step, "include_field");
+			includeFilename    = rep.getStepAttributeBoolean(id_step, "include");  
+			filenameField      = rep.getStepAttributeString (id_step, "include_field");
 			
-			addresultfile  =      rep.getStepAttributeBoolean(id_step, "addresultfile");
-			IsIgnoreEmptyFile  =      rep.getStepAttributeBoolean(id_step, "IsIgnoreEmptyFile");
+			addresultfile      = rep.getStepAttributeBoolean(id_step, "addresultfile");
+			IsIgnoreEmptyFile  = rep.getStepAttributeBoolean(id_step, "IsIgnoreEmptyFile");
 			
-			includeRowNumber  =      rep.getStepAttributeBoolean(id_step, "rownum");
-			rowNumberField    =      rep.getStepAttributeString (id_step, "rownum_field");
-			rowLimit          =      rep.getStepAttributeInteger(id_step, "limit");
-			encoding          =      rep.getStepAttributeString (id_step, "encoding");
+			includeRowNumber   = rep.getStepAttributeBoolean(id_step, "rownum");
+			rowNumberField     = rep.getStepAttributeString (id_step, "rownum_field");
+			rowLimit           = rep.getStepAttributeInteger(id_step, "limit");
+			encoding           = rep.getStepAttributeString (id_step, "encoding");
+			outputFormat       = rep.getStepAttributeString (id_step, "output_format");
 	
-			int nrFiles     = rep.countNrStepAttributes(id_step, "file_name");
-			int nrFields    = rep.countNrStepAttributes(id_step, "field_name");
+			int nrFiles        = rep.countNrStepAttributes(id_step, "file_name");
+			int nrFields       = rep.countNrStepAttributes(id_step, "field_name");
             
 			allocate(nrFiles, nrFields);
 
@@ -871,7 +883,8 @@ public class LoadTextFromFileMeta extends BaseStepMeta implements StepMetaInterf
 			rep.saveStepAttribute(id_transformation, id_step, "rownum",          includeRowNumber);
 			rep.saveStepAttribute(id_transformation, id_step, "rownum_field",    rowNumberField);
 			rep.saveStepAttribute(id_transformation, id_step, "limit",           rowLimit);
-            rep.saveStepAttribute(id_transformation, id_step, "encoding",        encoding);
+      rep.saveStepAttribute(id_transformation, id_step, "encoding",        encoding);
+      rep.saveStepAttribute(id_transformation, id_step, "output_format",   outputFormat);
 			
 			for (int i=0;i<fileName.length;i++)
 			{

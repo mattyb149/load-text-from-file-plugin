@@ -67,6 +67,7 @@ import org.pentaho.di.trans.step.BaseStepMeta;
 import org.pentaho.di.trans.step.StepDialogInterface;
 import org.pentaho.di.trans.steps.loadtextfromfile.LoadTextFromFileField;
 import org.pentaho.di.trans.steps.loadtextfromfile.LoadTextFromFileMeta;
+import org.pentaho.di.trans.steps.loadtextfromfile.TikaOutput;
 import org.pentaho.di.ui.core.dialog.EnterNumberDialog;
 import org.pentaho.di.ui.core.dialog.EnterSelectionDialog;
 import org.pentaho.di.ui.core.dialog.EnterTextDialog;
@@ -151,10 +152,13 @@ public class LoadTextFromFileDialog extends BaseStepDialog implements StepDialog
 	private Text         wLimit;
 	private FormData     fdlLimit, fdLimit;
     
-    private Label        wlEncoding;
-    private CCombo       wEncoding;
-    private FormData     fdlEncoding, fdEncoding;
+  private Label        wlEncoding;
+  private CCombo       wEncoding;
+  private FormData     fdlEncoding, fdEncoding;
 
+  private Label        wlOutputFormat;
+  private CCombo       wOutputFormat;
+  private FormData     fdlOutputFormat, fdOutputFormat;
    
 	private TableView    wFields;
 	private FormData     fdFields;
@@ -621,6 +625,25 @@ public class LoadTextFromFileDialog extends BaseStepDialog implements StepDialog
 		fdLimit.right= new FormAttachment(100, 0);
 		wLimit.setLayoutData(fdLimit);
 		
+		wlOutputFormat=new Label(wFileConf, SWT.RIGHT);
+    wlOutputFormat.setText(BaseMessages.getString(PKG, "LoadTextFromFileDialog.OutputFormat.Label"));
+    props.setLook(wlOutputFormat);
+    fdlOutputFormat=new FormData();
+    fdlOutputFormat.left = new FormAttachment(0, 0);
+    fdlOutputFormat.top  = new FormAttachment(wLimit, margin);
+    fdlOutputFormat.right= new FormAttachment(middle, -margin);
+    wlOutputFormat.setLayoutData(fdlOutputFormat);
+    wOutputFormat=new CCombo(wFileConf, SWT.BORDER | SWT.READ_ONLY);
+    wOutputFormat.setText(BaseMessages.getString(PKG, "LoadTextFromFileDialog.OutputFormat.Label"));
+    props.setLook(wOutputFormat);
+
+    wOutputFormat.setItems(TikaOutput.fileOutputTypeCodes.keySet().toArray(new String[] {}));
+    wOutputFormat.addModifyListener(lsMod);
+    fdOutputFormat=new FormData();
+    fdOutputFormat.left = new FormAttachment(middle, 0);
+    fdOutputFormat.top  = new FormAttachment(wLimit, margin);
+    fdOutputFormat.right= new FormAttachment(100, 0);
+    wOutputFormat.setLayoutData(fdOutputFormat);
 		
 		fdXmlConf = new FormData();
 		fdXmlConf.left = new FormAttachment(0, margin);
@@ -670,14 +693,14 @@ public class LoadTextFromFileDialog extends BaseStepDialog implements StepDialog
  		props.setLook(wlInclFilenameField);
 		fdlInclFilenameField=new FormData();
 		fdlInclFilenameField.left = new FormAttachment(wInclFilename, margin);
-		fdlInclFilenameField.top  = new FormAttachment(wLimit, 4*margin);
+		fdlInclFilenameField.top  = new FormAttachment(wOutputFormat, 4*margin);
 		wlInclFilenameField.setLayoutData(fdlInclFilenameField);
 		wInclFilenameField=new TextVar(transMeta, wAdditionalFields, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
  		props.setLook(wInclFilenameField);
 		wInclFilenameField.addModifyListener(lsMod);
 		fdInclFilenameField=new FormData();
 		fdInclFilenameField.left = new FormAttachment(wlInclFilenameField, margin);
-		fdInclFilenameField.top  = new FormAttachment(wLimit, 4*margin);
+		fdInclFilenameField.top  = new FormAttachment(wOutputFormat, 4*margin);
 		fdInclFilenameField.right= new FormAttachment(100, 0);
 		wInclFilenameField.setLayoutData(fdInclFilenameField);
 
@@ -1284,6 +1307,7 @@ public class LoadTextFromFileDialog extends BaseStepDialog implements StepDialog
       wInclRownumField.setText(in.getRowNumberField());
     wLimit.setText("" + in.getRowLimit());
     wEncoding.setText(Const.NVL(in.getEncoding(), ""));
+    wOutputFormat.setText((in.getOutputFormat() != null) ? in.getOutputFormat() : "Plain text");
 
     if (isDebug())
       logDebug(BaseMessages.getString(PKG, "LoadTextFromFileDialog.Log.GettingFieldsInfo"));
@@ -1379,9 +1403,10 @@ public class LoadTextFromFileDialog extends BaseStepDialog implements StepDialog
 	{
 		stepname = wStepname.getText(); // return value
 
-		// copy info to TextFileInputMeta class (input)
+		// copy info to LoadTextFromFileMeta class (input)
 		in.setRowLimit( Const.toLong(wLimit.getText(), 0L) );
-        in.setEncoding(wEncoding.getText());
+    in.setEncoding(wEncoding.getText());
+    in.setOutputFormat(wOutputFormat.getText());
 		in.setFilenameField( wInclFilenameField.getText() );
 		in.setRowNumberField( wInclRownumField.getText() );
 		in.setAddResultFile( wAddResult.getSelection() );

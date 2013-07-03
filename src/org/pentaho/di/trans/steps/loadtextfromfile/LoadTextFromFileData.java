@@ -32,8 +32,8 @@ import org.pentaho.di.trans.step.StepDataInterface;
 
 
 /**
- * @author Samatar
- * @since 21-06-2007
+ * @author MBurgess
+ * @since 02-Jul-2013
  */
 public class LoadTextFromFileData extends BaseStepData implements StepDataInterface 
 {

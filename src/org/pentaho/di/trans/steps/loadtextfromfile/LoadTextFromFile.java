@@ -22,6 +22,7 @@
 
 package org.pentaho.di.trans.steps.loadtextfromfile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,7 +30,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
-import org.apache.tika.Tika;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.ResultFile;
 import org.pentaho.di.core.exception.KettleException;
@@ -53,7 +53,7 @@ import org.pentaho.di.trans.step.StepMetaInterface;
  * Read files, parse them and convert them to rows and writes these to one or more output 
  * streams.
  * 
- * @author Samatar
+ * @author MBurges
  * @since 20-06-2007
  */
 public class LoadTextFromFile extends BaseStep implements StepInterface  
@@ -62,8 +62,6 @@ public class LoadTextFromFile extends BaseStep implements StepInterface
 
 	private LoadTextFromFileMeta meta;
 	private LoadTextFromFileData data;
-	
-	private static Tika tika;
 	
 	public LoadTextFromFile(StepMeta stepMeta, StepDataInterface stepDataInterface, int copyNr, TransMeta transMeta, Trans trans)
 	{
@@ -147,10 +145,15 @@ public class LoadTextFromFile extends BaseStep implements StepInterface
 				catch (Exception e)
 				{
 					throw new KettleException (e);
-				}finally{try {if(file!=null) file.close();}catch (Exception e){}
+				} finally {
+				  try {
+				    if(file!=null) {
+				      file.close();
+				    }
+				  }
+				  catch (Exception e){}
 				}
-			}else
-			{
+			} else {
 	            if (data.filenr>=data.files.nrOfFiles()) // finished processing!
 	            {
 	            	if (isDetailed()) logDetailed(BaseMessages.getString(PKG, "LoadTextFromFile.Log.FinishedProcessing"));
@@ -279,7 +282,7 @@ public class LoadTextFromFile extends BaseStep implements StepInterface
      * @return The content of the file as a String
      * @throws IOException
      */
-    public static String getTextFileContent(String vfsFilename, String encoding) throws KettleException
+    public String getTextFileContent(String vfsFilename, String encoding) throws KettleException
     {
     	InputStream inputStream =null;
     	InputStreamReader reader=null;
@@ -287,20 +290,9 @@ public class LoadTextFromFile extends BaseStep implements StepInterface
     	String retval=null;
     	try {
 	        inputStream = KettleVFS.getInputStream(vfsFilename);
-	        
-			/*if (!Const.isEmpty(encoding)) {
-				reader = new InputStreamReader(new BufferedInputStream(inputStream), encoding);
-			}else {
-		        reader = new InputStreamReader(new BufferedInputStream(inputStream));
-			}
-	
-	        int c;
-	        StringBuffer stringBuffer = new StringBuffer();
-	        while ( (c=reader.read())!=-1) stringBuffer.append((char)c);
-	        
-	        retval=stringBuffer.toString();*/
-	        
-	        retval = tika.parseToString(inputStream);
+	        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	        TikaOutput.parse(inputStream, meta.getOutputFormat(), baos);
+	        retval = baos.toString();
     	}catch(Exception e) {
     		throw new KettleException(BaseMessages.getString(PKG, "LoadTextFromFile.Error.GettingFileContent", vfsFilename, e.toString()));
     	}finally {
@@ -478,13 +470,6 @@ public class LoadTextFromFile extends BaseStep implements StepInterface
 		
 		if (super.init(smi, sdi))
 		{
-		  try {
-        tika = new Tika();
-      } catch (Exception e) {
-        e.printStackTrace();
-        return false;
-      } 
-		  
 		  if(!meta.getIsInFields())
 			{
 				try{
