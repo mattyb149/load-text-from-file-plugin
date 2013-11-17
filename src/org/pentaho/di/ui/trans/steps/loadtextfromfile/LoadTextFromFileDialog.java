@@ -1085,7 +1085,7 @@ public class LoadTextFromFileDialog extends BaseStepDialog implements StepDialog
 					{
 						FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 
-						dialog.setFilterExtensions(new String[] {"*.txt;", "*.csv", "*.TRT", "*"});
+						dialog.setFilterExtensions(new String[] {"*"});
 						
 						if (wFilename.getText()!=null)
 						{
@@ -1094,10 +1094,7 @@ public class LoadTextFromFileDialog extends BaseStepDialog implements StepDialog
 						}
 						
 			
-						dialog.setFilterNames(new String[] {BaseMessages.getString(PKG, "System.FileType.TextFiles"), 
-								BaseMessages.getString(PKG, "LoadTextFromFileDialog.FileType.TextAndCSVFiles"), 
-								BaseMessages.getString(PKG, "LoadTextFromFile.FileType.TRTFiles"),
-								BaseMessages.getString(PKG, "System.FileType.AllFiles")});
+						dialog.setFilterNames(new String[] {BaseMessages.getString(PKG, "System.FileType.AllFiles")});
 						
 						
 						if (dialog.open()!=null)

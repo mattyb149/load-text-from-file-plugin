@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.tika.io.TaggedIOException;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.ResultFile;
 import org.pentaho.di.core.exception.KettleException;
@@ -53,8 +54,7 @@ import org.pentaho.di.trans.step.StepMetaInterface;
  * Read files, parse them and convert them to rows and writes these to one or more output 
  * streams.
  * 
- * @author MBurges
- * @since 20-06-2007
+ * @author MBurgess
  */
 public class LoadTextFromFile extends BaseStep implements StepInterface  
 {
@@ -233,6 +233,8 @@ public class LoadTextFromFile extends BaseStep implements StepInterface
 	
 	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException
 	{
+	  
+	  Object[] r = null; 
 		try {
 			 // Grab a row
 			 Object[] outputRowData=getOneRow();
@@ -247,18 +249,28 @@ public class LoadTextFromFile extends BaseStep implements StepInterface
 			 putRow(data.outputRowMeta, outputRowData);
 			 
 			 if (meta.getRowLimit()>0 && data.rownr>meta.getRowLimit())  // limit has been reached: stop now.
-		     {
-		           setOutputDone();
-		           return false;
-		     }	
-		}catch(KettleException e)
-		{
-			logError(BaseMessages.getString(PKG, "LoadTextFromFile.ErrorInStepRunning",e.getMessage())); 
-			logError(Const.getStackTracker(e));
-			setErrors(1);
-			stopAll();
-			setOutputDone();  // signal end to receiver(s)
-			return false;
+		   {
+		     setOutputDone();
+		     return false;
+		   }	
+		}
+		catch(KettleException e) {
+		  boolean sendToErrorRow = false;
+      String errorMessage = null;
+		
+		  if ( getStepMeta().isDoingErrorHandling() ) {
+        sendToErrorRow = true;
+        errorMessage = e.toString();
+      } else {
+        logError(BaseMessages.getString(PKG, "LoadTextFromFile.ErrorInStepRunning",e.getMessage())); 
+      setErrors(1);
+      stopAll();
+      setOutputDone();  // signal end to receiver(s)
+      return false;
+      }
+      if ( sendToErrorRow ) {
+        logError(BaseMessages.getString(PKG, "LoadTextFromFile.ErrorInStepRunning",e.getMessage()));
+      }
 		}
 		 return true;
 		
@@ -268,7 +280,7 @@ public class LoadTextFromFile extends BaseStep implements StepInterface
 		try{
 			data.filecontent=getTextFileContent(data.file.toString(), meta.getEncoding());
 		} catch(java.lang.OutOfMemoryError o) {
-			logError( "There is no enaugh memory to load the content of the file ["+data.file.getName()+"]");
+			logError( BaseMessages.getString( PKG, "LoadTextFromFile.Error.NotEnoughMemory",data.file.getName()));
 			throw new KettleException(o);
 		} catch(Exception e) {
 			throw new KettleException(e);
@@ -293,9 +305,11 @@ public class LoadTextFromFile extends BaseStep implements StepInterface
 	        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	        TikaOutput.parse(inputStream, meta.getOutputFormat(), baos);
 	        retval = baos.toString();
-    	}catch(Exception e) {
+    	}
+    	catch(Exception e) {
     		throw new KettleException(BaseMessages.getString(PKG, "LoadTextFromFile.Error.GettingFileContent", vfsFilename, e.toString()));
-    	}finally {
+    	}
+    	finally {
     		if(reader!=null) try {reader.close();}catch(Exception e){};
     		if(inputStream!=null) try {inputStream.close();}catch(Exception e){};
     	}
@@ -510,5 +524,4 @@ public class LoadTextFromFile extends BaseStep implements StepInterface
 		}
 		super.dispose(smi, sdi);
 	}
-
 }

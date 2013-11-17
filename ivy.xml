@@ -4,7 +4,7 @@
 
   <configurations>
     <conf name="default"/>
-    <conf name="dev"/>
+    <conf name="dev" extends="default"/>
     <conf name="test" visibility="private"/>
     <conf name="source"/>
   </configurations>
@@ -34,5 +34,8 @@
     
     <!-- Test dependencies (JUnit, etc.) These should use the test configuration -->
     <dependency org="junit" name="junit" rev="${dependency.junit.revision}" transitive="false" conf="test->default"/>
+    
+    <!-- Exclude provided dependencies -->
+    <exclude conf="default" module="dom4j" />
   </dependencies>
 </ivy-module>
