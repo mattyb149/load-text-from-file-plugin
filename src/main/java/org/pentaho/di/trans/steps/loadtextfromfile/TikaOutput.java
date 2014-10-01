@@ -17,6 +17,7 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
+import com.google.gson.Gson;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
@@ -30,8 +31,6 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.ExpandedTitleContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
-
-import com.google.gson.Gson;
 
 public class TikaOutput {
   

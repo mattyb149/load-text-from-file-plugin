@@ -1,31 +1,6 @@
-/*******************************************************************************
- *
- * Pentaho Data Integration
- *
- * Copyright (C) 2002-2012 by Pentaho : http://www.pentaho.com
- *
- *******************************************************************************
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- ******************************************************************************/
-
 package org.pentaho.di.trans.steps.loadtextfromfile;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +27,7 @@ import org.pentaho.di.trans.step.StepMetaInterface;
 
 /**
  * Read files, parse them and convert them to rows and writes these to one or more output streams.
- * 
+ *
  * @author MBurgess
  */
 public class LoadTextFromFile extends BaseStep implements StepInterface {
@@ -62,7 +37,7 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
   private LoadTextFromFileData data;
 
   public LoadTextFromFile( StepMeta stepMeta, StepDataInterface stepDataInterface, int copyNr, TransMeta transMeta,
-      Trans trans ) {
+                           Trans trans ) {
     super( stepMeta, stepDataInterface, copyNr, transMeta, trans );
   }
 
@@ -70,7 +45,7 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
     if ( meta.addResultFile() ) {
       // Add this to the result file names...
       ResultFile resultFile =
-          new ResultFile( ResultFile.FILE_TYPE_GENERAL, file, getTransMeta().getName(), getStepname() );
+            new ResultFile( ResultFile.FILE_TYPE_GENERAL, file, getTransMeta().getName(), getStepname() );
       resultFile.setComment( "File was read by a LoadTextFromFile step" );
       addResultFile( resultFile );
     }
@@ -83,8 +58,9 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
 
         if ( data.readrow == null ) // finished processing!
         {
-          if ( isDetailed() )
+          if ( isDetailed() ) {
             logDetailed( BaseMessages.getString( PKG, "LoadTextFromFile.Log.FinishedProcessing" ) );
+          }
           return false;
         }
 
@@ -112,9 +88,9 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
               if ( data.indexOfFilenameField < 0 ) {
                 // The field is unreachable !
                 logError( BaseMessages.getString( PKG, "LoadTextFromFile.Log.ErrorFindingField" ) + "["
-                    + meta.getDynamicFilenameField() + "]" );
+                      + meta.getDynamicFilenameField() + "]" );
                 throw new KettleException( BaseMessages.getString( PKG, "LoadTextFromFile.Exception.CouldnotFindField",
-                    meta.getDynamicFilenameField() ) );
+                      meta.getDynamicFilenameField() ) );
               }
             }
             // Get the number of previous fields
@@ -126,9 +102,10 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
         // get field value
         String Fieldvalue = data.inputRowMeta.getString( data.readrow, data.indexOfFilenameField );
 
-        if ( isDetailed() )
+        if ( isDetailed() ) {
           logDetailed( BaseMessages.getString( PKG, "LoadTextFromFile.Log.Stream", meta.getDynamicFilenameField(),
-              Fieldvalue ) );
+                Fieldvalue ) );
+        }
 
         FileObject file = null;
         try {
@@ -147,13 +124,14 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
       } else {
         if ( data.filenr >= data.files.nrOfFiles() ) // finished processing!
         {
-          if ( isDetailed() )
+          if ( isDetailed() ) {
             logDetailed( BaseMessages.getString( PKG, "LoadTextFromFile.Log.FinishedProcessing" ) );
+          }
           return false;
         }
 
         // Is this the last file?
-        data.last_file = ( data.filenr == data.files.nrOfFiles() - 1 );
+        data.last_file = (data.filenr == data.files.nrOfFiles() - 1);
         data.file = (FileObject) data.files.getFile( data.filenr );
       }
 
@@ -167,8 +145,9 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
         openNextFile();
 
       } else {
-        if ( isDetailed() )
+        if ( isDetailed() ) {
           logDetailed( BaseMessages.getString( PKG, "LoadTextFromFile.Log.OpeningFile", data.file.toString() ) );
+        }
         data.filename = KettleVFS.getFilename( data.file );
         // Add additional fields?
         if ( meta.getShortFileNameField() != null && meta.getShortFileNameField().length() > 0 ) {
@@ -204,7 +183,7 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
 
     } catch ( Exception e ) {
       logError( BaseMessages.getString( PKG, "LoadTextFromFile.Log.UnableToOpenFile", "" + data.filenr, data.file
-          .toString(), e.toString() ) );
+            .toString(), e.toString() ) );
       stopAll();
       setErrors( 1 );
       return false;
@@ -223,9 +202,10 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
         return false; // end of data or error.
       }
 
-      if ( isRowLevel() )
+      if ( isRowLevel() ) {
         logRowlevel( BaseMessages.getString( PKG, "LoadTextFromFile.Log.ReadRow", data.outputRowMeta
-            .getString( outputRowData ) ) );
+              .getString( outputRowData ) ) );
+      }
 
       putRow( data.outputRowMeta, outputRowData );
 
@@ -239,8 +219,7 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
 
       if ( getStepMeta().isDoingErrorHandling() ) {
         putError( getInputRowMeta(), r, 1, errorMessage, meta.getFilenameField(), "LoadTextFromFile001" );
-      }
-      else {
+      } else {
         logError( BaseMessages.getString( PKG, "LoadTextFromFile.ErrorInStepRunning", e.getMessage() ) );
         throw new KettleStepException( BaseMessages.getString( PKG, "LoadTextFromFile.ErrorInStepRunning" ), e );
       }
@@ -262,11 +241,9 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
 
   /**
    * Read a text file.
-   * 
-   * @param vfsFilename
-   *          the filename or URL to read from
-   * @param charSetName
-   *          the character set of the string (UTF-8, ISO8859-1, etc)
+   *
+   * @param vfsFilename the filename or URL to read from
+   * @param encoding    the character set of the string (UTF-8, ISO8859-1, etc)
    * @return The content of the file as a String
    * @throws IOException
    */
@@ -276,25 +253,34 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
 
     String retval = null;
     try {
-      inputStream = KettleVFS.getInputStream( vfsFilename );
+      // HACK: Check for local files, use a FileInputStream in that case
+      //  The version of VFS we use will close the stream when all bytes are read, and if
+      //  the file is less than 64KB (which is what Tika will read), then bad things happen.
+      if ( vfsFilename.startsWith( "file:" ) ) {
+        inputStream = new FileInputStream( vfsFilename.substring( 5 ) );
+      } else {
+        inputStream = KettleVFS.getInputStream( vfsFilename );
+      }
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       TikaOutput.parse( inputStream, meta.getOutputFormat(), baos );
       retval = baos.toString();
     } catch ( Exception e ) {
       throw new KettleException( BaseMessages.getString( PKG, "LoadTextFromFile.Error.GettingFileContent", vfsFilename,
-          e.toString() ) );
+            e.toString() ) );
     } finally {
-      if ( reader != null )
+      if ( reader != null ) {
         try {
           reader.close();
         } catch ( Exception e ) {
         }
+      }
       ;
-      if ( inputStream != null )
+      if ( inputStream != null ) {
         try {
           inputStream.close();
         } catch ( Exception e ) {
         }
+      }
       ;
     }
 
@@ -307,7 +293,7 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
     if ( nonExistantFiles.size() != 0 ) {
       String message = FileInputList.getRequiredFilesDescription( nonExistantFiles );
       logError( BaseMessages.getString( PKG, "LoadTextFromFile.Log.RequiredFilesTitle" ), BaseMessages.getString( PKG,
-          "LoadTextFromFile.Log.RequiredFiles", message ) );
+            "LoadTextFromFile.Log.RequiredFiles", message ) );
 
       throw new KettleException( BaseMessages.getString( PKG, "LoadTextFromFile.Log.RequiredFilesMissing", message ) );
     }
@@ -316,15 +302,15 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
     if ( nonAccessibleFiles.size() != 0 ) {
       String message = FileInputList.getRequiredFilesDescription( nonAccessibleFiles );
       logError( BaseMessages.getString( PKG, "LoadTextFromFile.Log.RequiredFilesTitle" ), BaseMessages.getString( PKG,
-          "LoadTextFromFile.Log.RequiredNotAccessibleFiles", message ) );
+            "LoadTextFromFile.Log.RequiredNotAccessibleFiles", message ) );
       throw new KettleException( BaseMessages.getString( PKG, "LoadTextFromFile.Log.RequiredNotAccessibleFilesMissing",
-          message ) );
+            message ) );
     }
   }
 
   /**
    * Build an empty row based on the meta-data...
-   * 
+   *
    * @return
    */
 
@@ -344,8 +330,9 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
 
     try {
       // Create new row or clone
-      if ( meta.getIsInFields() )
+      if ( meta.getIsInFields() ) {
         System.arraycopy( data.readrow, 0, outputRowData, 0, data.readrow.length );
+      }
 
       // Read fields...
       for ( int i = 0; i < data.nrInputFields; i++ ) {
@@ -460,8 +447,8 @@ public class LoadTextFromFile extends BaseStep implements StepInterface {
           // Create the output row meta-data
           data.outputRowMeta = new RowMeta();
           meta.getFields( data.outputRowMeta, getStepname(), null, null, this, repository, metaStore ); // get the
-                                                                                                        // metadata
-                                                                                                        // populated
+          // metadata
+          // populated
 
           // Create convert meta-data objects that will contain Date & Number formatters
           //

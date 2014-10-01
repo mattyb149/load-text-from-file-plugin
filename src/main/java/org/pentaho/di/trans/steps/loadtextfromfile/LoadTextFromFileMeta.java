@@ -1,25 +1,3 @@
-/*******************************************************************************
- *
- * Pentaho Data Integration
- *
- * Copyright (C) 2002-2012 by Pentaho : http://www.pentaho.com
- *
- *******************************************************************************
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- ******************************************************************************/
-
 package org.pentaho.di.trans.steps.loadtextfromfile;
 
 import java.util.List;
@@ -58,7 +36,11 @@ import org.pentaho.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
 
 
-@Step(id = "LoadTextFromFile", image = "load-text-from-file.png", name = "Load text from file", description = "Parses text content from various input file types", categoryDescription="Input")
+@Step(id = "LoadTextFromFile",
+      image = "load-text-from-file.png",
+      name = "Load text from file",
+      description = "Parses text content from various input file types",
+      categoryDescription = "Input")
 public class LoadTextFromFileMeta extends BaseStepMeta implements StepMetaInterface
 {	
 	private static Class<?> PKG = LoadTextFromFileMeta.class; // for i18n purposes, needed by Translator2!!   $NON-NLS-1$
@@ -273,7 +255,7 @@ public class LoadTextFromFileMeta extends BaseStepMeta implements StepMetaInterf
 	}
 	
 	/** 
-	 * @param the IsIgnoreEmptyFile to set
+	 * @param IsIgnoreEmptyFile to set
 	 */
 	public void setIgnoreEmptyFile(boolean IsIgnoreEmptyFile)
 	{
