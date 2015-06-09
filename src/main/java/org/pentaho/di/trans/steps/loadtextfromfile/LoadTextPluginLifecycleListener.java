@@ -19,6 +19,7 @@ public class LoadTextPluginLifecycleListener implements LifecycleListener {
     consumer = new LoadTextFromFileExternalResourceConsumer();
     analyzer.setExternalResourceConsumer( consumer );
     PentahoSystem.registerObject( analyzer );
+    PentahoSystem.registerObject( consumer );
   }
 
   @Override
