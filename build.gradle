@@ -43,7 +43,7 @@ dependencies {
   provided("pentaho-kettle:kettle-ui-swt:${project.ext.kettle_dependency_revision}")
   provided("pentaho:metastore:${project.ext.kettle_dependency_revision}")
   provided("org.eclipse.swt:swt-linux-x86_64:4.3.2")
-  provided("com.pentaho:pentaho-metaverse-api:${project.ext.kettle_dependency_revision}")
+  provided("pentaho:pentaho-metaverse-api:${project.ext.kettle_dependency_revision}")
   compile ("org.apache.tika:tika-app:${project.ext.tika_dependency_revision}")
   //compile("org.apache.tika:tika-parsers:${project.ext.tika_dependency_revision}")
   //compile('com.google.code.gson:gson:1.7.1')

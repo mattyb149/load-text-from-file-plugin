@@ -1,13 +1,13 @@
 package org.pentaho.di.trans.steps.loadtextfromfile;
 
-import com.pentaho.dictionary.DictionaryConst;
-import com.pentaho.metaverse.api.IMetaverseNode;
-import com.pentaho.metaverse.api.MetaverseAnalyzerException;
-import com.pentaho.metaverse.api.MetaverseException;
-import com.pentaho.metaverse.api.StepField;
-import com.pentaho.metaverse.api.analyzer.kettle.step.ExternalResourceStepAnalyzer;
-import com.pentaho.metaverse.api.model.IExternalResourceInfo;
 import org.pentaho.di.trans.step.BaseStepMeta;
+import org.pentaho.dictionary.DictionaryConst;
+import org.pentaho.metaverse.api.IMetaverseNode;
+import org.pentaho.metaverse.api.MetaverseAnalyzerException;
+import org.pentaho.metaverse.api.MetaverseException;
+import org.pentaho.metaverse.api.StepField;
+import org.pentaho.metaverse.api.analyzer.kettle.step.ExternalResourceStepAnalyzer;
+import org.pentaho.metaverse.api.model.IExternalResourceInfo;
 
 import java.util.HashSet;
 import java.util.Set;
