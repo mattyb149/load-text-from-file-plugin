@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileObject;
 import org.apache.tika.io.TaggedIOException;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.ResultFile;
